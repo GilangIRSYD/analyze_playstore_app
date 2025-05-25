@@ -1,0 +1,21 @@
+.PHONY: dev start install freeze clean
+
+# install dependency dari requirements.txt
+install:
+	pip install -r requirements.txt
+
+# jalankan server di development mode
+dev:
+	uvicorn main:app --reload
+
+# jalankan server production mode
+start:
+	gunicorn -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:8000 --workers 4
+
+# simpan dependency project ke requirements.txt
+freeze:
+	pip freeze > requirements.txt
+
+# hapus virtual environment & file __pycache__
+clean:
+	rm -rf venv __pycache__
