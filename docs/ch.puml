@@ -1,0 +1,53 @@
+@startuml ERD Analisis Review with Summary
+
+!define pk(x) <b><color:#b8861b><&key></color> x</b>
+!define fk(x) <color:#aaaaaa><&key></color> x
+
+entity applications {
+  pk(application_id) : UUID <<PK>>
+  --
+  name : VARCHAR(255)
+  description : TEXT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity reviews {
+  pk(review_id) : UUID <<PK>>
+  fk(application_id) : UUID <<FK>>
+  --
+  review_text : TEXT
+  created_at : TIMESTAMP
+}
+
+entity analyses {
+  pk(analysis_id) : UUID <<PK>>
+  fk(application_id) : UUID <<FK>>
+  --
+  analysis_name : VARCHAR(255)
+  analysis_type : VARCHAR(100)
+  wordcloud_data : TEXT
+  positive_count : INTEGER
+  negative_count : INTEGER
+  neutral_count  : INTEGER
+  summary_notes  : TEXT
+  last_analysis_at : TIMESTAMP
+  created_at : TIMESTAMP
+}
+
+entity review_analyses {
+  pk(review_analysis_id) : UUID <<PK>>
+  fk(review_id) : UUID <<FK>>
+  fk(analysis_id) : UUID <<FK>>
+  --
+  result : VARCHAR(50)
+  confidence_score : DECIMAL(3,2)
+  created_at : TIMESTAMP
+}
+
+applications ||--o{ reviews : "has"
+applications ||--o{ analyses : "offers"
+reviews ||--o{ review_analyses : "has"
+analyses ||--o{ review_analyses : "used in"
+
+@enduml

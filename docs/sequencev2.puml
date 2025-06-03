@@ -1,0 +1,39 @@
+@startuml
+
+actor User
+participant Frontend as FE
+participant Backend as BE
+participant Database as DB
+participant "Scraper & Analytic Worker" as Worker
+
+== User request analysis ==
+
+User -> FE : Input application_id
+FE -> BE : POST /api/analyses {application_id}
+
+BE -> DB : INSERT INTO analyses (application_id, status='pending')
+DB --> BE : Return new analysis_id
+BE --> FE : Return analysis_id
+
+FE -> BE : (optional) GET /api/applications/:id (load info)
+
+== Worker scrape & analisis ==
+
+BE -> Worker : Trigger scrape & analisis (with analysis_id)
+Worker -> DB : Scrape reviews → INSERT INTO reviews
+Worker -> DB : INSERT INTO review_analyses (review_id, analysis_id)
+Worker -> DB : Update analyses SET status='completed', summary_result, wordcloud_url WHERE analysis_id
+
+== FE polling status ==
+
+loop every 5s
+    FE -> BE : GET /api/analyses/:analysis_id
+    BE -> DB : SELECT status FROM analyses WHERE analysis_id
+    DB --> BE : Return status
+    BE --> FE : Return status
+end
+
+== Hasil didapat ==
+
+
+@enduml

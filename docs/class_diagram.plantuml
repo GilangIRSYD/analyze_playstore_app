@@ -1,0 +1,46 @@
+@startuml
+
+
+' ENUM untuk Sentiment
+enum SentimentEnum {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+}
+
+' Entities (Tabel)
+entity Application {
+  id : STRING <<PK>>
+  --
+  nama : VARCHAR
+}
+
+entity Review {
+  id : STRING <<PK>>
+  applicationId : STRING <<FK>>
+  --
+  reviewLink : STRING
+  sentiment : SentimentEnum
+}
+
+entity History {
+  id : STRING <<PK>>
+  applicationId : STRING <<FK>>
+  --
+  image : STRING
+  createdAt : DATE
+}
+
+entity History_Review {
+  reviewId : STRING <<FK>>
+  historyId : STRING <<FK>>
+  --
+}
+
+' Relasi antar tabel dengan cardinality
+Application ||--o{ History        : has
+Application ||--o{ Review         : has
+History     ||--o{ History_Review : contains
+Review      ||--o{ History_Review : related_to
+
+@enduml

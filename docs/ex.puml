@@ -1,0 +1,88 @@
+@startuml Improved Database Design - Sistem Analisis Ulasan
+
+' Style definitions
+!define primary_key(x) <b><color:#b8861b><&key></color> x</b>
+!define foreign_key(x) <color:#aaaaaa><&key></color> x
+!define pk(x,y) <b><color:#b8861b><&key></color> x</b> : y <<PK>>
+!define column(x) <color:#ccc><&media-record></color> x
+
+
+' Application entity
+entity applications {
+  pk(application_id, UUID)
+  --
+  column(name) : VARCHAR(255) NOT NULL
+  column(description) : TEXT
+  column(created_at) : TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  column(updated_at) : TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+}
+
+' Review entity
+entity reviews {
+  primary_key(review_id) : UUID <<PK>>
+  foreign_key(application_id) : UUID <<FK>>
+  --
+  column(review_link) : VARCHAR(500) NOT NULL
+  column(sentiment) : SentimentEnum NOT NULL
+  column(confidence_score) : DECIMAL(3,2)
+  column(created_at) : TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  column(updated_at) : TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+}
+
+' History entity
+entity histories {
+  primary_key(history_id) : UUID <<PK>>
+  foreign_key(application_id) : UUID <<FK>>
+  --
+  column(image_url) : VARCHAR(500)
+  column(analysis_type) : VARCHAR(100)
+  column(status) : VARCHAR(50) DEFAULT 'pending'
+  column(created_at) : TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  column(updated_at) : TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+}
+
+' Junction table with primary key
+entity history_reviews {
+  primary_key(history_review_id) : UUID <<PK>>
+  foreign_key(review_id) : UUID <<FK>>
+  foreign_key(history_id) : UUID <<FK>>
+  --
+  column(relationship_type) : VARCHAR(100)
+  column(analysis_weight) : DECIMAL(3,2) DEFAULT 1.0
+  column(created_at) : TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  column(notes) : TEXT
+}
+
+' Enum definition
+enum SentimentEnum {
+    POSITIVE
+    NEGATIVE  
+    NEUTRAL
+}
+
+' Relationships
+applications ||--o{ histories : "has many"
+applications ||--o{ reviews : "has many"
+histories ||--o{ history_reviews : "linked in"
+reviews ||--o{ history_reviews : "included in"
+
+' Additional constraints (as notes)
+note right of history_reviews
+  UNIQUE KEY: (review_id, history_id)
+  CASCADE DELETE on both FKs
+  Prevents duplicate relationships
+end note
+
+note right of reviews
+  INDEX: application_id, sentiment, created_at
+  Validates review_link format
+  Confidence score 0.00-1.00
+end note
+
+note right of histories
+  INDEX: application_id, status, created_at
+  Status: pending, processing, completed, failed
+  Analysis types: sentiment, topic, trend
+end note
+
+@enduml

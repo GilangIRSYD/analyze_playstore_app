@@ -1,0 +1,171 @@
+@startuml ERD Analisis Review with Summary
+
+!define pk(x,y) <color:#b8861b><&key></color> x : y <i><b><<PK>></b></i> <color:transparent><&media-record></color>
+!define fk(x, y) <color:#aaaaaa><&key></color> x : y <color:#00000090><i><b><<FK>></b></i></color> <color:transparent><&media-record></color>
+!define column(x,y) <color:transparent><&media-record></color> x  :  y <color:transparent><&media-record></color>
+
+<style>
+  classDiagram {
+    class {
+      FontName Menlo
+      FontColor #21282B
+      BackgroundColor #F8F8FF
+      FontSize 14
+      Padding 100
+      Margin 103
+    }
+    header {
+      FontSize 16
+      FontColor #171818
+      FontStyle bold
+      BackgroundColor #C0D6D060
+    }
+  }
+</style>
+
+skinparam nodesep 50
+
+entity Applications {
+  pk(application_id, UUID)
+  --
+
+  column(summary, TEXT)
+  
+  column(name, VARCHAR(100)) 
+
+  column(icon, VARCHAR(255))
+
+  column(url, VARCHAR(255))
+
+  column(score, DECIMAL(3,2))
+
+  column(totalReview, INTEGER)
+
+  column(countReview, INTEGER)
+
+  column(developer_team, VARCHAR(100))
+
+  column(developer_team_id, UUID)
+
+  column(created_at, TIMESTAMP) 
+
+  column(updated_at, TIMESTAMP) 
+
+  column(token_next_scrape, TEXT)
+
+}
+
+entity Reviews {
+  pk(review_id, UUID)
+
+  fk(application_id, UUID)
+  --
+  
+  column(content, TEXT)
+
+  column(username, VARCHAR(100))
+
+  column(score, DECIMAL(3,2))
+
+  column(user_pict, VARCHAR(255))
+
+  column(version_app, VARCHAR(50))
+
+  column(at, TIMESTAMP)
+
+  column(reply_content, TEXT)
+
+  column(reply_at, TIMESTAMP)
+
+  column(url, VARCHAR(255))
+
+  column(sentiment, SentimentEnum)
+
+  column(category, CategoryEnum)
+
+}
+
+entity Analyses {
+  pk(analysis_id, UUID) 
+
+  fk(application_id, UUID)
+  --
+
+  column(negative_wordclouds,  VARCHAR(255))
+
+  column(positive_wordclouds,  VARCHAR(255))
+
+  column(neutral_wordclouds,  VARCHAR(255))
+
+  column(bug_wordclouds,  VARCHAR(255))
+
+  column(feature_wordclouds,  VARCHAR(255))
+
+  column(ux_wordclouds,  VARCHAR(255))
+
+  column(noise_wordclouds,  VARCHAR(255))
+
+  column(positive_count,  INTEGER)
+
+  column(negative_count,  INTEGER)
+
+  column(neutral_count ,  INTEGER)
+
+  column(bug_count ,  INTEGER)
+
+  column(feature_count ,  INTEGER)
+
+  column(ux_count ,  INTEGER)
+
+  column(noise_count ,  INTEGER)
+
+  column(last_analysis_at,  TIMESTAMP)
+
+  column(created_at,  TIMESTAMP)
+
+  column(confidence_score_sentiment, DECIMAL(3,2))
+
+  column(confidence_score_category, DECIMAL(3,2))
+
+  column(status, AnalysisStatusEnum)
+
+}
+
+entity Review_Analysis {
+  pk(review_analysis_id, UUID)
+
+  fk(review_id, UUID)
+
+  fk(analysis_id, UUID)
+  --
+
+  column(created_at, TIMESTAMP)
+
+}
+
+enum SentimentEnum {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+}
+
+enum CategoryEnum {
+  FEATURE
+  BUG
+  UX
+  NOISE
+}
+
+enum AnalysisStatusEnum {
+  PROCESSING
+  COMPLETED
+}
+
+SentimentEnum -[hidden] CategoryEnum
+
+Applications ||--o{ Reviews
+Applications ||--o{ Analyses
+Reviews ||--o{ Review_Analysis
+Analyses ||--o{ Review_Analysis
+
+@enduml

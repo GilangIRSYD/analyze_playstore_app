@@ -25,6 +25,7 @@ def get_list_reviews(
     logger.debug(app_id)
     detail = gplay(app_id, lang, country)
 
+    
     return {
         "id": detail["appId"],
         "title": detail["title"],

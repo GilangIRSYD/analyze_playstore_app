@@ -1,0 +1,56 @@
+@startuml
+title Sequence Diagram: User Request Analysis for App X
+
+actor User
+participant Frontend as FE
+participant Backend as BE
+participant DB
+participant ScraperWorker as Worker
+
+== App Not Found Flow ==
+User -> FE: Input app id (e.g., com.example.app)
+FE -> BE: POST /api/analyses {app_id}
+BE -> DB: SELECT application WHERE app_id='com.example.app'
+DB --> BE: No record found
+BE -> DB: Insert application record
+BE -> Worker: Trigger async scraping + analysis job
+BE --> FE: {status: processing, analysis_id}
+FE -> FE: Show "Processing..." message
+
+== Async Worker Process ==
+Worker -> ScraperWorker: Scrape 2000 reviews
+ScraperWorker -> Worker: Reviews data
+Worker -> Worker: Run IndoBERT analysis
+Worker -> DB: Insert reviews, analyses, wordcloud
+Worker -> DB: Update analyses status = completed
+
+== Polling from FE ==
+loop every few seconds
+    FE -> BE: GET /api/analyses/{analysis_id}
+    BE -> DB: Query analysis status
+    DB --> BE: {status: processing/completed, summary, etc}
+    BE --> FE: analysis status and data
+    alt status == completed
+        FE -> FE: Render summary + reviews
+        break
+    else status == processing
+        FE -> FE: Show loading
+    end
+end
+
+== App Found Flow ==
+User -> FE: Input app id (e.g., com.example.app)
+FE -> BE: GET /api/analyses?app_id=com.example.app
+BE -> DB: SELECT application WHERE app_id='com.example.app'
+DB --> BE: Application record found
+BE -> DB: SELECT latest analysis WHERE app_id ORDER BY created_at DESC
+DB --> BE: Analysis found with status
+alt status == completed
+    BE --> FE: Return summary + analysis_id
+    FE -> FE: Render summary + reviews
+else status == processing
+    BE --> FE: Return status processing
+    FE -> FE: Show loading
+end
+
+@enduml
