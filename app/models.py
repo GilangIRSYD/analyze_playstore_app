@@ -80,3 +80,11 @@ class Analysis(Base):
     confidence_score_sentiment = Column(DECIMAL(3, 2), nullable=True)
     confidence_score_category = Column(DECIMAL(3, 2), nullable=True)
     status = Column(Enum(AnalysisStatusEnum, name="analysis_status_enum"), nullable=False)
+    
+class ReviewAnalysis(Base):
+    __tablename__ = "review_analyses"
+
+    review_analysis_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    review_id = Column(UUID(as_uuid=True), ForeignKey("reviews.review_id"), nullable=False)
+    analysis_id = Column(UUID(as_uuid=True), ForeignKey("analyses.analysis_id"), nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False)
