@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    container_name: postgres_anz
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: sehatdeh
+      POSTGRES_DB: agent_review_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+
+  redis:
+      image: redis:7
+      container_name: redis_anz
+      restart: always
+      ports:
+        - "6379:6379"
+      volumes:
+        - ./redis-data:/data
