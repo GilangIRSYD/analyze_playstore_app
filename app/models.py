@@ -18,6 +18,10 @@ class CategoryEnum(str, enum.Enum):
     BUG = "BUG"
     UX = "UX"
     NOISE = "NOISE"
+    
+class AnalysisStatusEnum(str, enum.Enum):
+    PROCESSING = "PROCESSING"
+    COMPLETED = "COMPLETED"
 
 class Application(Base):
     __tablename__ = "applications"
@@ -31,8 +35,8 @@ class Application(Base):
     total_review = Column(Integer)
     count_review = Column(Integer)
     developer_team = Column(String(255))
-    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
-    updated_at = Column(TIMESTAMP(timezone=True), onupdate=func.now())
+    created_at = Column(TIMESTAMP, server_default=func.now())
+    updated_at = Column(TIMESTAMP, onupdate=func.now())
     token_next_scrape = Column(Text)
     
 class Review(Base):
@@ -51,3 +55,28 @@ class Review(Base):
     url = Column(String(255), nullable=True) 
     sentiment = Column(Enum(SentimentEnum, name="sentiment_enum"), nullable=False)
     category = Column(Enum(CategoryEnum, name="category_enum"), nullable=False)
+
+class Analysis(Base):
+    __tablename__ = "analyses"
+
+    analysis_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    application_id = Column(UUID(as_uuid=True), ForeignKey("applications.application_id"), nullable=False)
+    negative_wordclouds = Column(String(255), nullable=True)
+    positive_wordclouds = Column(String(255), nullable=True)
+    neutral_wordclouds = Column(String(255), nullable=True)
+    bug_wordclouds = Column(String(255), nullable=True)
+    feature_wordclouds = Column(String(255), nullable=True)
+    ux_wordclouds = Column(String(255), nullable=True)
+    noise_wordclouds = Column(String(255), nullable=True)
+    positive_count = Column(Integer, nullable=False, default=0)
+    negative_count = Column(Integer, nullable=False, default=0)
+    neutral_count = Column(Integer, nullable=False, default=0)
+    bug_count = Column(Integer, nullable=False, default=0)
+    feature_count = Column(Integer, nullable=False, default=0)
+    ux_count = Column(Integer, nullable=False, default=0)
+    noise_count = Column(Integer, nullable=False, default=0)
+    last_analysis_at = Column(TIMESTAMP, nullable=True)
+    created_at = Column(TIMESTAMP, nullable=False)
+    confidence_score_sentiment = Column(DECIMAL(3, 2), nullable=True)
+    confidence_score_category = Column(DECIMAL(3, 2), nullable=True)
+    status = Column(Enum(AnalysisStatusEnum, name="analysis_status_enum"), nullable=False)
