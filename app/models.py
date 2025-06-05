@@ -79,7 +79,7 @@ class Analysis(Base):
     created_at = Column(TIMESTAMP, nullable=False)
     confidence_score_sentiment = Column(DECIMAL(3, 2), nullable=True)
     confidence_score_category = Column(DECIMAL(3, 2), nullable=True)
-    status = Column(Enum(AnalysisStatusEnum, name="analysis_status_enum"), nullable=False)
+    status = Column(Enum(AnalysisStatusEnum, name="analysis_status_enum"), default=AnalysisStatusEnum.PROCESSING, nullable=False)
     
 class ReviewAnalysis(Base):
     __tablename__ = "review_analyses"
