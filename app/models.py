@@ -26,7 +26,7 @@ class AnalysisStatusEnum(str, enum.Enum):
 class Application(Base):
     __tablename__ = "applications"
 
-    application_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    application_id = Column(String(255), primary_key=True, nullable=False)
     summary = Column(String(255))
     name = Column(String(255), nullable=False)
     icon = Column(String(255))
@@ -43,7 +43,7 @@ class Review(Base):
     __tablename__ = "reviews"
     
     review_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
-    application_id = Column(UUID(as_uuid=True)), ForeignKey("applications.application_id", nullable=False)
+    application_id = Column(String(255)), ForeignKey("applications.application_id", nullable=False)
     content= Column(Text, nullable=True)
     username = Column(String(100), nullable=False)
     score = Column(DECIMAL(3, 2), nullable=False)
@@ -60,7 +60,7 @@ class Analysis(Base):
     __tablename__ = "analyses"
 
     analysis_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    application_id = Column(UUID(as_uuid=True), ForeignKey("applications.application_id"), nullable=False)
+    application_id = Column(String(255), ForeignKey("applications.application_id"), nullable=False)
     negative_wordclouds = Column(String(255), nullable=True)
     positive_wordclouds = Column(String(255), nullable=True)
     neutral_wordclouds = Column(String(255), nullable=True)
