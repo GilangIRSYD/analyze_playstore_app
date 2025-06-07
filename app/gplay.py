@@ -1,14 +1,16 @@
-from fastapi import APIRouter, Query, Body, Header
-from google_play_scraper import app as gplay, reviews as gplayReviews
-from google_play_scraper.features.reviews import ContinuationToken
-from pydantic import BaseModel
+import logging
+
 from typing import Optional
+from pydantic import BaseModel
+from fastapi import APIRouter, Query, Header
+from google_play_scraper import app as gplay, reviews as gplayReviews
+
 from app.config.constant import get_review_detail_url
 from app.helper.utils import (
     dict_to_base64,
     base64_to_obj
 )
-import logging
+
 
 GPLAY_DETAIL_REVIEW_LINK_TEMPLATE = "https://play.google.com/store/apps/details?id={appId}&reviewId={reviewId}"
 router = APIRouter()

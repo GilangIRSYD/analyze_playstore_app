@@ -1,9 +1,9 @@
-from sqlalchemy import Column, String, DECIMAL, Integer, TIMESTAMP, Text, ForeignKey, Enum
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.sql import func
-from sqlalchemy.orm import declarative_base
 import uuid
 import enum
+from sqlalchemy import Column, String, DECIMAL, Integer, TIMESTAMP, Text, ForeignKey, Enum
+from sqlalchemy.sql import func
+from sqlalchemy.orm import declarative_base
+from sqlalchemy.dialects.postgresql import UUID
 
 Base = declarative_base()
 Metadata = Base.metadata
