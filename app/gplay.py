@@ -3,6 +3,7 @@ from google_play_scraper import app as gplay, reviews as gplayReviews
 from google_play_scraper.features.reviews import ContinuationToken
 from pydantic import BaseModel
 from typing import Optional
+from app.config.constant import get_review_detail_url
 from app.helper.utils import (
     dict_to_base64,
     base64_to_obj
@@ -89,3 +90,48 @@ def get_reviews(
         "reviews": reviews,
         "count_data": len(reviews)
     }
+    
+def get_string_token(token_next: str):
+    return dict_to_base64({
+        "token": token_next.token,
+        "lang": token_next.lang,
+        "country": token_next.country,
+        "sort": token_next.sort,
+        "count": token_next.count,
+        "filter_score_with": token_next.filter_score_with,
+        "filter_device_with": token_next.filter_device_with
+    })
+    
+def fetch_reviews(
+        app_id: str,
+        lang: str = "id",
+        country: str = "id",
+        count: int = 2000,
+        token: str = None
+    ):
+    
+    if token is not None:
+        _reviews, _token = gplayReviews(
+            app_id = app_id,
+            continuation_token=base64_to_obj(token, TokenNext)
+        )
+        
+    _reviews, _token = gplayReviews(
+        app_id=app_id,
+        lang=lang,
+        country=country,
+        count=count,
+    )
+    
+    reviews = list(map(
+        lambda review: {
+            **review, 
+            "url": get_review_detail_url(app_id=app_id, review_id=review["reviewId"])
+            },
+            _reviews
+        ))
+    
+    string_token = get_string_token(token_next=_token)
+    
+    return (reviews, string_token)
+
