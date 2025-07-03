@@ -117,13 +117,13 @@ def fetch_reviews(
             app_id = app_id,
             continuation_token=base64_to_obj(token, TokenNext)
         )
-        
-    _reviews, _token = gplayReviews(
-        app_id=app_id,
-        lang=lang,
-        country=country,
-        count=count,
-    )
+    else:
+        _reviews, _token = gplayReviews(
+            app_id=app_id,
+            lang=lang,
+            country=country,
+            count=count,
+        )
     
     reviews = list(map(
         lambda review: {
@@ -136,4 +136,19 @@ def fetch_reviews(
     string_token = get_string_token(token_next=_token)
     
     return (reviews, string_token)
+
+def fetch_app_detail(app_id: str):
+    detail = gplay(app_id, lang="id", country="id")
+
+    return {
+        "application_id": detail["appId"],
+        "name": detail["title"],
+        "summary": detail["summary"],
+        "score": detail["score"],
+        "total_review": detail["reviews"],
+        "url": detail["url"],
+        "icon": detail["icon"],
+        "developer_team": detail["developer"],
+    }
+    
 

@@ -1,4 +1,4 @@
-.PHONY: dev start install freeze clean
+.PHONY: dev start install freeze clean worker flower
 
 # install dependency dari requirements.txt
 install:
@@ -7,6 +7,14 @@ install:
 # jalankan server di development mode
 dev:
 	uvicorn main:app --reload
+
+# run worker
+worker:
+	celery -A app.config.celery_app worker --loglevel=debug --concurrency=2 
+
+# run worker ui
+flower:
+	celery -A app.config.celery_app flower --port=5555
 
 # jalankan server production mode
 start:
