@@ -6,3 +6,4 @@ data/
 redis-data/
 
 .env
+.DS_Store
